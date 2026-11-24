@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "author": "Ricardo Gabriel Diaz - S0D53 Parcial 2",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 120, "left": 240, "attrs": {} },
+    { "type": "wokwi-breadboard-half", "id": "bb1", "top": 360, "left": 140, "attrs": {} },
+    { "type": "wokwi-hc-sr04", "id": "ultrasonic_mano", "top": -40, "left": 20, "attrs": { "distance": "50" } },
+    { "type": "wokwi-hc-sr04", "id": "ultrasonic_nivel", "top": -40, "left": 260, "attrs": { "distance": "35" } },
+    { "type": "wokwi-servo", "id": "servo1", "top": 120, "left": 480, "attrs": {} },
+    { "type": "wokwi-lcd1602", "id": "lcd1", "top": -60, "left": 500, "attrs": { "pins": "i2c" } },
+    { "type": "wokwi-led", "id": "led_verde", "top": 270, "left": 70, "attrs": { "color": "green" } },
+    { "type": "wokwi-led", "id": "led_amar", "top": 270, "left": 115, "attrs": { "color": "yellow" } },
+    { "type": "wokwi-led", "id": "led_rojo", "top": 270, "left": 160, "attrs": { "color": "red" } },
+    { "type": "wokwi-resistor", "id": "r1", "top": 430, "left": 70, "rotate": 90, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "r2", "top": 430, "left": 115, "rotate": 90, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "r3", "top": 430, "left": 160, "rotate": 90, "attrs": { "value": "220" } },
+    { "type": "wokwi-buzzer", "id": "bz1", "top": 240, "left": 510, "attrs": { "volume": "0.2" } },
+    { "type": "wokwi-slide-switch", "id": "sw_sensor", "top": 470, "left": 500, "attrs": {} },
+    { "type": "wokwi-slide-switch", "id": "sw_tapa", "top": 470, "left": 580, "attrs": {} }
+  ],
+  "connections": [
+    [ "esp:5V", "bb1:tp.1", "red", [ "h-20", "v90" ] ],
+    [ "esp:GND.1", "bb1:tn.1", "black", [ "h-30", "v90" ] ],
+
+    [ "ultrasonic_mano:VCC", "bb1:tp.2", "red", [ "v20", "h-60", "v310" ] ],
+    [ "ultrasonic_mano:GND", "bb1:tn.2", "black", [ "v20", "h-40", "v310" ] ],
+    [ "ultrasonic_mano:TRIG", "esp:13", "orange", [ "v40", "h110" ] ],
+    [ "ultrasonic_mano:ECHO", "esp:14", "gold", [ "v50", "h100" ] ],
+
+    [ "ultrasonic_nivel:VCC", "bb1:tp.4", "red", [ "v20", "h-90", "v310" ] ],
+    [ "ultrasonic_nivel:GND", "bb1:tn.4", "black", [ "v20", "h-70", "v310" ] ],
+    [ "ultrasonic_nivel:TRIG", "esp:26", "blue", [ "v30", "h-120" ] ],
+    [ "ultrasonic_nivel:ECHO", "esp:27", "cyan", [ "v40", "h-110" ] ],
+
+    [ "servo1:V+", "bb1:tp.20", "red", [ "h-20", "v170" ] ],
+    [ "servo1:GND", "bb1:tn.20", "black", [ "h-10", "v180" ] ],
+    [ "servo1:PWM", "esp:18", "purple", [ "h-40", "v10" ] ],
+
+    [ "lcd1:VCC", "bb1:tp.22", "red", [ "h-20", "v360" ] ],
+    [ "lcd1:GND", "bb1:tn.22", "black", [ "h-30", "v370" ] ],
+    [ "lcd1:SDA", "esp:21", "green", [ "h-60", "v180" ] ],
+    [ "lcd1:SCL", "esp:22", "white", [ "h-70", "v160" ] ],
+
+    [ "esp:25", "r1:1", "green", [ "h-60", "v170" ] ],
+    [ "r1:2", "led_verde:A", "green", [ "v-10" ] ],
+    [ "led_verde:C", "bb1:tn.6", "black", [ "v40" ] ],
+
+    [ "esp:33", "r2:1", "yellow", [ "h-50", "v180" ] ],
+    [ "r2:2", "led_amar:A", "yellow", [ "v-10" ] ],
+    [ "led_amar:C", "bb1:tn.8", "black", [ "v40" ] ],
+
+    [ "esp:32", "r3:1", "orange", [ "h-40", "v190" ] ],
+    [ "r3:2", "led_rojo:A", "orange", [ "v-10" ] ],
+    [ "led_rojo:C", "bb1:tn.10", "black", [ "v40" ] ],
+
+    [ "bz1:2", "esp:19", "magenta", [ "v-10", "h-130" ] ],
+    [ "bz1:1", "bb1:tn.24", "black", [ "v40" ] ],
+
+    [ "sw_sensor:2", "esp:4", "violet", [ "v-40", "h-100" ] ],
+    [ "sw_sensor:3", "bb1:tn.16", "black", [ "v-20" ] ],
+
+    [ "sw_tapa:2", "esp:5", "gray", [ "v-30", "h-180" ] ],
+    [ "sw_tapa:3", "bb1:tn.18", "black", [ "v-20" ] ]
+  ],
+  "dependencies": {}
+}

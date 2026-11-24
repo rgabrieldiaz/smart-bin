@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Bin IoT — Parcial 2 | Integración Tecnológica (S0D53)</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-2: #162032;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #10b981;
+      --accent-2: #38bdf8;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --border: #334155;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    a { color: var(--accent-2); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    header {
+      background: linear-gradient(135deg, #0b1325 0%, #132a3e 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 3rem 1.5rem 2.5rem;
+    }
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 1.25rem; }
+    .badge {
+      display: inline-block;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 0.9rem;
+    }
+    h1 { font-size: 2.3rem; margin: 0 0 0.5rem; color: #fff; letter-spacing: -0.02em; }
+    .subtitle { color: var(--muted); font-size: 1.05rem; margin: 0 0 1.4rem; max-width: 780px; }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+    }
+    .meta-card {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
+    }
+    .meta-card strong { display: block; color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
+    .btn {
+      display: inline-block;
+      padding: 0.65rem 1.15rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.92rem;
+    }
+    .btn-primary { background: var(--accent); color: #052e16; }
+    .btn-secondary { background: var(--surface); color: #fff; border: 1px solid var(--border); }
+    nav.toc {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 0;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    nav.toc a {
+      display: inline-block;
+      color: var(--muted);
+      font-size: 0.84rem;
+      margin-right: 1rem;
+      font-weight: 500;
+    }
+    nav.toc a:hover { color: #fff; }
+    main { padding: 2rem 0 4rem; }
+    section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+    h2 {
+      margin: 0 0 1rem;
+      font-size: 1.35rem;
+      color: #fff;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+    h3 { margin: 1.25rem 0 0.5rem; font-size: 1.05rem; color: var(--accent-2); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.9rem 0;
+      font-size: 0.88rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.6rem 0.7rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: var(--surface-2); color: #fff; font-weight: 600; }
+    .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+    .card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.15rem;
+    }
+    .formula-box {
+      background: #0b1325;
+      border-left: 4px solid var(--accent-2);
+      padding: 0.9rem 1.1rem;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.88rem;
+      margin: 0.8rem 0;
+      overflow-x: auto;
+    }
+    .gantt-bar-wrap { background: #0b1325; border-radius: 6px; height: 18px; position: relative; min-width: 180px; }
+    .gantt-bar { position: absolute; top: 2px; bottom: 2px; background: var(--accent); border-radius: 4px; }
+    .blocks-diagram {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.8rem;
+      margin: 1rem 0;
+    }
+    .block-node {
+      background: #0b1325;
+      border: 1px solid var(--accent-2);
+      border-radius: 10px;
+      padding: 0.9rem;
+    }
+    .block-node.power { border-color: var(--warn); }
+    .block-node.comm { border-color: var(--accent); }
+    .block-node h4 { margin: 0 0 0.4rem; font-size: 0.9rem; color: #fff; }
+    .block-node ul { margin: 0; padding-left: 1.1rem; font-size: 0.84rem; color: var(--muted); }
+    .wire-img {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      margin-top: 0.75rem;
+    }
+    .fault-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--danger);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .fault-card.normal { border-left-color: var(--accent); }
+    .fault-card.warn { border-left-color: var(--warn); }
+    pre {
+      background: #0b1325;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      overflow-x: auto;
+      font-size: 0.8rem;
+      line-height: 1.45;
+      color: #cbd5e1;
+      max-height: 460px;
+    }
+    .pill {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .pill-ok { background: rgba(16,185,129,0.2); color: #34d399; }
+    .pill-err { background: rgba(239,68,68,0.2); color: #f87171; }
+    .pill-warn { background: rgba(245,158,11,0.2); color: #fbbf24; }
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      padding: 1.5rem 1rem 3rem;
+      border-top: 1px solid var(--border);
+    }
+    @media print {
+      body { background: #fff; color: #111; }
+      header, section, .card, .block-node, .fault-card { background: #fff !important; color: #111 !important; border-color: #ccc !important; }
+      nav.toc, .cta-row { display: none; }
+      h1, h2, h3, th { color: #000 !important; }
+      .subtitle, .muted, .block-node ul { color: #333 !important; }
+      pre { max-height: none; background: #f8fafc !important; color: #111 !important; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <span class="badge">Parcial 2 — Modalidad Simulada con Detección de Fallas</span>
+    <h1>Smart Bin IoT — Cesto de Residuos Inteligente</h1>
+    <p class="subtitle">
+      Prototipo IoT sobre ESP32 con apertura sin contacto, monitoreo ultrasónico de porcentaje de llenado,
+      semáforo local en pantalla LCD I2C, notificaciones en tiempo real por Telegram y protocolos de Modo Seguro ante fallas de sensores y actuadores.
+    </p>
+    <div class="meta-grid">
+      <div class="meta-card"><strong>Estudiante</strong>Ricardo Gabriel Díaz (Legajo 29135452)</div>
+      <div class="meta-card"><strong>Materia / Comisión</strong>PP: Integración Tecnológica (S0D53) — ACM5AV</div>
+      <div class="meta-card"><strong>Docente</strong>Sebastián Suárez Cores</div>
+      <div class="meta-card"><strong>Institución / Fecha</strong>Escuela Da Vinci — Noviembre 2026</div>
+    </div>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://wokwi.com/projects/481600182431364097" target="_blank" rel="noopener">Abrir Simulador Wokwi en Vivo</a>
+      <a class="btn btn-secondary" href="#escenarios">Ver Escenarios de Falla</a>
+      <a class="btn btn-secondary" href="#consumo">Ver Cálculo Eléctrico</a>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="container">
+    <a href="#intro">1. Introducción y Objetivos</a>
+    <a href="#gantt">2. Gantt</a>
+    <a href="#bloques">3. Diagrama de Bloques</a>
+    <a href="#wire">4. Wire Diagram</a>
+    <a href="#consumo">5. Consumo Eléctrico</a>
+    <a href="#presupuesto">6. Presupuesto</a>
+    <a href="#hardware">7. Hardware y Software</a>
+    <a href="#escenarios">8. Pruebas y Fallas</a>
+    <a href="#codigo">9. Código</a>
+    <a href="#resultados">10. Resultados y Conclusiones</a>
+  </div>
+</nav>
+
+<main class="container">
+
+  <!-- 1. INTRODUCCION Y OBJETIVOS -->
+  <section id="intro">
+    <h2>1. Introducción y Objetivos</h2>
+    <p>
+      En edificios, oficinas y espacios públicos, los cestos de residuos tradicionales presentan dos problemas operativos concretos:
+      el contacto directo de las manos con la tapa (foco de contaminación cruzada) y el desborde imprevisto por falta de visibilidad
+      sobre el nivel de llenado real, lo que obliga a recorridos innecesarios o a recolecciones tardías.
+    </p>
+    <p>
+      Mediante tecnología IoT sobre un microcontrolador <strong>ESP32</strong>, el proyecto <strong>Smart Bin IoT</strong> resuelve ambos
+      problemas automatizando la apertura sin contacto, midiendo continuamente el volumen ocupado en porcentaje y enviando alertas puntuales
+      por <strong>Telegram</strong> al personal de limpieza únicamente cuando el contenedor supera el umbral crítico o presenta una anomalía técnica.
+    </p>
+    <div class="two-col">
+      <div class="card">
+        <h3>Objetivo General</h3>
+        <p>Diseñar, simular y validar un sistema IoT funcional de gestión inteligente de residuos con apertura automática, telemetría de llenado y respuesta segura ante fallas de hardware.</p>
+      </div>
+      <div class="card">
+        <h3>Objetivos Específicos</h3>
+        <ul>
+          <li>Implementar apertura sin contacto (&le; 20 cm) y cierre automático diferido (4 s) mediante sensor ultrasónico y servomotor.</li>
+          <li>Medir el porcentaje de llenado en tiempo real, reflejándolo en LCD I2C y semáforo LED (Verde, Amarillo, Rojo).</li>
+          <li>Integrar conectividad Wi-Fi (<code>Wokwi-GUEST</code>) y envío de notificaciones HTTPS a Telegram con detección de flanco anti-spam.</li>
+          <li>Diseñar y probar escenarios de falla intencionales (sensor y actuador) con transición a Modo Seguro.</li>
+          <li>Dimensionar formalmente el consumo eléctrico (<code>P = V &times; I</code>, Wh diarios y margen de seguridad del 30%).</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. DIAGRAMA DE GANTT -->
+  <section id="gantt">
+    <h2>2. Planificación Temporal (Diagrama de Gantt)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Fase / Actividad</th>
+          <th>Período</th>
+          <th>Duración</th>
+          <th>Cronograma Visual (Noviembre 2026)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1. Definición de problema, alcance y selección de componentes</td>
+          <td>18/11 – 20/11</td>
+          <td>3 días</td>
+          <td><div class="gantt-bar-wrap"><div class="gantt-bar" style="left:0%; width:25%;"></div></div></td>
+        </tr>
+        <tr>
+          <td>2. Arquitectura (Bloques), asignación de pines y Wire Diagram en Wokwi</td>
+          <td>21/11 – 23/11</td>
+          <td>3 días</td>
+          <td><div class="gantt-bar-wrap"><div class="gantt-bar" style="left:25%; width:25%;"></div></div></td>
+        </tr>
+        <tr>
+          <td>3. Programación ESP32, integración Wi-Fi + Telegram y lógica de fallas</td>
+          <td>23/11 – 24/11</td>
+          <td>2 días</td>
+          <td><div class="gantt-bar-wrap"><div class="gantt-bar" style="left:45%; width:25%;"></div></div></td>
+        </tr>
+        <tr>
+          <td>4. Ensayos funcionales, simulación de fallas y cálculo de consumo</td>
+          <td>24/11</td>
+          <td>1 día</td>
+          <td><div class="gantt-bar-wrap"><div class="gantt-bar" style="left:65%; width:15%;"></div></div></td>
+        </tr>
+        <tr>
+          <td>5. Defensa oral en vivo (Google Meet)</td>
+          <td>25/11</td>
+          <td>1 día</td>
+          <td><div class="gantt-bar-wrap"><div class="gantt-bar" style="left:75%; width:10%; background:var(--accent-2);"></div></div></td>
+        </tr>
+        <tr>
+          <td>6. Cierre de informe técnico / Landing Page y entrega en DVCAMPUS</td>
+          <td>26/11 – 28/11</td>
+          <td>3 días</td>
+          <td><div class="gantt-bar-wrap"><div class="gantt-bar" style="left:82%; width:18%; background:var(--warn);"></div></div></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 3. DIAGRAMA DE BLOQUES -->
+  <section id="bloques">
+    <h2>3. Diagrama de Bloques (Arquitectura Funcional IoT)</h2>
+    <p>
+      Siguiendo la metodología de la cátedra, el sistema se organiza en los <strong>5 bloques funcionales</strong> de una arquitectura IoT,
+      separando captación de datos, procesamiento, actuación local, comunicación remota y alimentación eléctrica:
+    </p>
+    <div class="blocks-diagram">
+      <div class="block-node">
+        <h4>1. Entradas (Sensores)</h4>
+        <ul>
+          <li>HC-SR04 Externo (presencia mano &le; 20 cm)</li>
+          <li>HC-SR04 Interno (distancia a residuos)</li>
+          <li>2x Switches de prueba (inyección de fallas)</li>
+        </ul>
+      </div>
+      <div class="block-node">
+        <h4>2. Procesamiento</h4>
+        <ul>
+          <li>ESP32 DevKit v1 (32-bit, Wi-Fi integrado)</li>
+          <li>Cálculo de % llenado y umbrales</li>
+          <li>Máquina de estados y Modo Seguro</li>
+        </ul>
+      </div>
+      <div class="block-node">
+        <h4>3. Salidas (Actuadores)</h4>
+        <ul>
+          <li>Servomotor SG90 (tapa 0° / 90°)</li>
+          <li>LCD 16x2 I2C (estado y códigos de error)</li>
+          <li>Semáforo LED (Verde/Amarillo/Rojo)</li>
+          <li>Buzzer (avisos sonoros y alarmas)</li>
+        </ul>
+      </div>
+      <div class="block-node comm">
+        <h4>4. Comunicación</h4>
+        <ul>
+          <li>Red Wi-Fi <code>Wokwi-GUEST</code></li>
+          <li>API HTTPS REST de Telegram</li>
+          <li>Notificaciones por flanco al celular</li>
+        </ul>
+      </div>
+      <div class="block-node power">
+        <h4>5. Alimentación</h4>
+        <ul>
+          <li>Fuente DC 5V / 2A (uso fijo)</li>
+          <li>Rieles comunes 5V (Rojo) y GND (Negro)</li>
+          <li>Alternativa portátil: 3x 18650 (3P)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="formula-box">
+[HC-SR04 Mano + HC-SR04 Nivel] ──&gt; [ ESP32 DevKit v1 ] ──&gt; [Servo SG90 + LCD I2C + 3 LEDs + Buzzer]
+                                      ▲           │
+                                      │           ▼
+                            [Fuente DC 5V/2A]   [Wi-Fi Wokwi-GUEST] ──&gt; [API Telegram] ──&gt; [Celular Usuario]
+    </div>
+  </section>
+
+  <!-- 4. WIRE DIAGRAM -->
+  <section id="wire">
+    <h2>4. Esquema de Conexiones (Wire Diagram)</h2>
+    <p>
+      El circuito fue armado en <strong>Wokwi</strong> utilizando una protoboard de distribución para garantizar una única referencia de masa común
+      y evitar compartir pines físicos en la placa ESP32. Se respetó estrictamente la convención de colores:
+      <strong>Rojo = 5V (VCC)</strong>, <strong>Negro = GND</strong> y colores diferenciados por señal. Todos los LEDs incorporan resistencias limitadoras de <strong>220 &Omega;</strong> en serie.
+    </p>
+    <img class="wire-img" src="./assets/circuito_wokwi.png" alt="Captura del Wire Diagram del Smart Bin IoT en Wokwi" />
+    <h3>Tabla de Conexionado (Pinout ESP32)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Componente</th>
+          <th>Pin Componente</th>
+          <th>Destino ESP32 / Protoboard</th>
+          <th>Color de Cable</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Alimentación General</td><td>5V / GND</td><td>Riel <code>+</code> / Riel <code>-</code> Protoboard</td><td>Rojo / Negro</td></tr>
+        <tr><td>HC-SR04 Externo (Mano)</td><td>VCC / GND / TRIG / ECHO</td><td>5V / GND / GPIO 13 / GPIO 14</td><td>Rojo / Negro / Naranja / Dorado</td></tr>
+        <tr><td>HC-SR04 Interno (Nivel)</td><td>VCC / GND / TRIG / ECHO</td><td>5V / GND / GPIO 26 / GPIO 27</td><td>Rojo / Negro / Azul / Cian</td></tr>
+        <tr><td>Servomotor SG90</td><td>V+ / GND / PWM</td><td>5V / GND / GPIO 18</td><td>Rojo / Negro / Violeta</td></tr>
+        <tr><td>LCD 16x2 I2C (0x27)</td><td>VCC / GND / SDA / SCL</td><td>5V / GND / GPIO 21 / GPIO 22</td><td>Rojo / Negro / Verde / Blanco</td></tr>
+        <tr><td>LED Verde / Amarillo / Rojo</td><td>Ánodo (via R 220 &Omega;) / Cátodo</td><td>GPIO 25 / 33 / 32 &rarr; GND</td><td>Verde / Amarillo / Naranja / Negro</td></tr>
+        <tr><td>Buzzer</td><td>Positivo (+) / Negativo (-)</td><td>GPIO 19 / GND</td><td>Magenta / Negro</td></tr>
+        <tr><td>Switches de Falla (S1 / S2)</td><td>Común (2) / Pin 3</td><td>GPIO 4 / GPIO 5 &rarr; GND (<code>INPUT_PULLUP</code>)</td><td>Violeta / Gris / Negro</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 5. CALCULO DE CONSUMO ELECTRICO -->
+  <section id="consumo">
+    <h2>5. Cálculo Formal de Consumo Eléctrico (P = V &times; I)</h2>
+    <p>
+      Aplicando paso a paso la metodología de la guía de cátedra (<em>Cálculo del Consumo en un Sistema IoT</em>), se relevan los tres estados
+      eléctricos (reposo, normal y pico de arranque/transmisión) de cada componente para dimensionar la fuente de alimentación y la autonomía en batería.
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Componente</th>
+          <th>Voltaje (V)</th>
+          <th>I Reposo (mA)</th>
+          <th>I Normal (mA)</th>
+          <th>I Pico (mA)</th>
+          <th>P Normal (W)</th>
+          <th>Ciclo de Trabajo</th>
+          <th>P Promedio (W)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>ESP32 DevKit v1 (Wi-Fi activo)</td><td>5.0 V</td><td>30 mA</td><td>100 mA</td><td>240 mA</td><td>0.500 W</td><td>100%</td><td>0.500 W</td></tr>
+        <tr><td>2x Sensor HC-SR04</td><td>5.0 V</td><td>4 mA</td><td>30 mA</td><td>40 mA</td><td>0.150 W</td><td>100%</td><td>0.150 W</td></tr>
+        <tr><td>LCD 16x2 I2C (con backlight)</td><td>5.0 V</td><td>20 mA</td><td>25 mA</td><td>30 mA</td><td>0.125 W</td><td>100%</td><td>0.125 W</td></tr>
+        <tr><td>Semáforo LED (1 activo + 220 &Omega;)</td><td>3.3 V</td><td>0 mA</td><td>10 mA</td><td>10 mA</td><td>0.033 W</td><td>100%</td><td>0.033 W</td></tr>
+        <tr><td>Buzzer (avisos puntuales)</td><td>3.3 V</td><td>0 mA</td><td>30 mA</td><td>30 mA</td><td>0.099 W</td><td>1%</td><td>0.001 W</td></tr>
+        <tr><td>Servomotor SG90 (tapa)</td><td>5.0 V</td><td>10 mA</td><td>150 mA</td><td>650 mA</td><td>0.750 W</td><td>5% activo / 95% rep.</td><td>0.085 W</td></tr>
+        <tr>
+          <td><strong>TOTAL DEL SISTEMA</strong></td>
+          <td><strong>5.0 V</strong></td>
+          <td><strong>64 mA</strong></td>
+          <td><strong>345 mA</strong></td>
+          <td><strong>1000 mA (1.0 A)</strong></td>
+          <td><strong>1.657 W</strong></td>
+          <td><strong>—</strong></td>
+          <td><strong>0.894 W (&approx; 0.90 W)</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="formula-box">
+1) Potencia promedio diaria (P_prom):
+   P_prom = 0.500 + 0.150 + 0.125 + 0.033 + 0.001 + 0.085 = 0.894 W (~0.90 W)
+
+2) Energía consumida en 24 horas (E = P × t):
+   E_24h = 0.90 W × 24 h = 21.6 Wh/día (0.0216 kWh)
+
+3) Margen de seguridad del 30% (obligatorio por presencia de Servomotor + Wi-Fi):
+   E_margen = 21.6 Wh × 1.30 = 28.08 Wh/día
+
+4) Corriente de pico simultáneo (ESP32 transmitiendo + Servo en arranque):
+   I_pico_total = 1000 mA = 1.0 A  -->  P_pico = 5 V × 1.0 A = 5.0 W
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>Fuente Recomendada (Instalación Fija)</h3>
+        <p>
+          <strong>Fuente conmutada DC 5V / 2A (10 W).</strong> Absorbe sin caídas de tensión el pico de arranque del servo SG90 (650 mA)
+          sumado a la transmisión Wi-Fi del ESP32 (240 mA), evitando reinicios por <em>brownout</em>.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Dimensionamiento Portátil (Baterías 18650)</h3>
+        <p>
+          Con celdas Li-Ion 18650 de <strong>3.7 V / 2600 mAh</strong> (9.62 Wh por celda):
+          <code>28.08 Wh / 3.7 V = 7.59 Ah</code> &rarr; requiere <strong>3 celdas en paralelo (3P = 7800 mAh)</strong> con módulo boost 5V + TP4056 para 24 h continuas.
+          <em>(Optimizando con Deep Sleep en una futura versión se reduce a 1 sola celda).</em>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. PRESUPUESTO -->
+  <section id="presupuesto">
+    <h2>6. Presupuesto Estimado (Factibilidad Económica — ARS)</h2>
+    <table>
+      <thead>
+        <tr><th>Componente</th><th>Cantidad</th><th>Precio Unitario Aprox. (ARS)</th><th>Subtotal (ARS)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Placa ESP32 DevKit v1 (30 pines, Wi-Fi/BT)</td><td>1</td><td>$ 14.500</td><td>$ 14.500</td></tr>
+        <tr><td>Sensor Ultrasónico HC-SR04</td><td>2</td><td>$ 3.500</td><td>$ 7.000</td></tr>
+        <tr><td>Servomotor Micro SG90 (180°)</td><td>1</td><td>$ 4.800</td><td>$ 4.800</td></tr>
+        <tr><td>Display LCD 16x2 con módulo I2C soldado</td><td>1</td><td>$ 7.500</td><td>$ 7.500</td></tr>
+        <tr><td>Protoboard 400 puntos + set cables Dupont</td><td>1</td><td>$ 6.000</td><td>$ 6.000</td></tr>
+        <tr><td>LEDs (Verde, Amarillo, Rojo), 3x R 220 &Omega; y Buzzer 5V</td><td>1 kit</td><td>$ 2.500</td><td>$ 2.500</td></tr>
+        <tr><td>Fuente de alimentación DC 5V / 2A</td><td>1</td><td>$ 6.500</td><td>$ 6.500</td></tr>
+        <tr><td colspan="3"><strong>TOTAL ESTIMADO DEL PROTOTIPO FÍSICO</strong></td><td><strong>$ 48.800 ARS</strong></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 7. DESCRIPCION DE HARDWARE Y SOFTWARE -->
+  <section id="hardware">
+    <h2>7. Descripción del Hardware y Software Utilizado</h2>
+    <p>
+      El sistema integra dos sensores ultrasónicos para captar la proximidad de la mano y el nivel interno de residuos. La placa
+      <strong>ESP32 DevKit v1</strong> procesa ambas lecturas, gobierna un servomotor SG90 para la apertura de la tapa, muestra el estado
+      en una pantalla LCD 16x2 por bus I2C junto a un semáforo de 3 LEDs y un buzzer, y transmite alertas críticas mediante HTTPS a un Bot de Telegram.
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Elemento / Componente</th>
+          <th>Función en el sistema</th>
+          <th>Criterio de selección técnica</th>
+          <th>Alternativas evaluadas y motivo de descarte</th>
+          <th>Forma de conexión / Interfaz</th>
+          <th>Librerías o código relacionado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ESP32 DevKit v1</td>
+          <td>Microcontrolador principal y conectividad Wi-Fi</td>
+          <td>Wi-Fi nativo, 30 pines GPIO, soporte directo de <code>Wokwi-GUEST</code> y TLS</td>
+          <td>Arduino UNO: descartado por carecer de Wi-Fi integrado</td>
+          <td>USB / Fuente 5V externa</td>
+          <td><code>WiFi.h</code>, <code>WiFiClientSecure.h</code>, <code>HTTPClient.h</code></td>
+        </tr>
+        <tr>
+          <td>2x Sensor HC-SR04</td>
+          <td>Detección de mano (&le;20 cm) y nivel de llenado (5–40 cm)</td>
+          <td>Medición sin contacto resistente a suciedad, bajo costo y rango preciso</td>
+          <td>Sensor IR obstáculo: descartado por sensibilidad a luz ambiental y objetos oscuros</td>
+          <td>Pines digitales TRIG/ECHO (13/14 y 26/27), 5V</td>
+          <td><code>pulseIn()</code> con timeout de 30 ms</td>
+        </tr>
+        <tr>
+          <td>Servomotor SG90</td>
+          <td>Acciona apertura (90°) y cierre (0°) de la tapa</td>
+          <td>Control angular exacto por PWM sin necesidad de driver H-bridge externo</td>
+          <td>Motor DC común: descartado por requerir puente H y finales de carrera adicionales</td>
+          <td>Pin PWM GPIO 18, alimentación 5V</td>
+          <td><code>ESP32Servo.h</code></td>
+        </tr>
+        <tr>
+          <td>LCD 16x2 I2C</td>
+          <td>Muestra % de llenado, estado de tapa y códigos de falla</td>
+          <td>Reduce de 6 a solo 2 pines (SDA/SCL), alta legibilidad local</td>
+          <td>LCD paralelo sin I2C: descartado por consumir demasiados GPIOs</td>
+          <td>Bus I2C (SDA=21, SCL=22), dirección <code>0x27</code></td>
+          <td><code>Wire.h</code>, <code>LiquidCrystal_I2C.h</code></td>
+        </tr>
+        <tr>
+          <td>3x LEDs + R 220 &Omega; + Buzzer</td>
+          <td>Semáforo visual de capacidad y alertas sonoras</td>
+          <td>Lectura instantánea a distancia y aviso acústico de apertura o falla</td>
+          <td>Tira NeoPixel: descartada por mayor consumo y complejidad innecesaria</td>
+          <td>GPIOs 25, 33, 32 (LEDs) y GPIO 19 (Buzzer)</td>
+          <td><code>digitalWrite()</code>, <code>tone()</code></td>
+        </tr>
+        <tr>
+          <td>2x Slide Switch</td>
+          <td>Inyección controlada de fallas en simulación</td>
+          <td>Permite demostrar fallas de sensor y actuador en vivo sin desarmar el circuito</td>
+          <td>Desconexión manual de cables: descartada por poca reproducibilidad en vivo</td>
+          <td>GPIOs 4 y 5 con <code>INPUT_PULLUP</code> a GND</td>
+          <td><code>digitalRead()</code> activo en <code>LOW</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Arquitectura del Software</h3>
+    <p>
+      El firmware fue desarrollado en C++ para Arduino/ESP32 y validado en Wokwi. Se utilizan las librerías <code>WiFi.h</code>,
+      <code>WiFiClientSecure.h</code> y <code>HTTPClient.h</code> para la comunicación HTTPS directa contra la API de Telegram (sin depender
+      de librerías externas inestables), junto a <code>ESP32Servo.h</code> y <code>LiquidCrystal_I2C.h</code> para el control de actuadores.
+    </p>
+    <p>
+      El código se estructura de forma modular: en <code>setup()</code> se inicializan pines, LCD, servo en posición cerrada y la conexión
+      Wi-Fi con timeout controlado de 15 segundos (si no hay red, el dispositivo continúa operando en modo local autónomo). En <code>loop()</code>
+      se evalúan primero las condiciones de falla crítica, luego el porcentaje de llenado con <code>constrain()</code> y la apertura/cierre no bloqueante
+      mediante <code>millis()</code>.
+    </p>
+    <p>
+      Para evitar el envío repetitivo de mensajes (spam), todas las notificaciones a Telegram implementan <strong>detección de flanco</strong>
+      mediante banderas booleanas de estado (<code>alertaLlenoEnviada</code>, <code>alertaFallaSensorEnviada</code>, <code>alertaFallaTapaEnviada</code>),
+      garantizando exactamente una alerta por evento y un aviso de restablecimiento cuando la condición se normaliza.
+    </p>
+  </section>
+
+  <!-- 8. ENSAYOS, PRUEBAS Y ESCENARIOS DE FALLA -->
+  <section id="escenarios">
+    <h2>8. Ensayos, Pruebas y Escenarios de Falla (Plantilla Obligatoria)</h2>
+    <p>
+      Se diseñaron y ejecutaron 4 escenarios en simulación (1 funcionamiento normal + 2 fallas de componentes obligatorias + 1 protección operativa anti-desborde),
+      documentados bajo la plantilla oficial de la cátedra:
+    </p>
+
+    <div class="fault-card normal">
+      <span class="pill pill-ok">Escenario 1 — Funcionamiento Normal</span>
+      <p><strong>Nombre del escenario:</strong> Apertura sin contacto y monitoreo progresivo de llenado.</p>
+      <p><strong>Tipo:</strong> Funcionamiento Normal.</p>
+      <p><strong>Descripción de la condición inicial:</strong> Cesto al 14% (35 cm), LED verde encendido, tapa cerrada (0°), Wi-Fi <code>Wokwi-GUEST</code> conectado (<code>IP 10.10.0.2</code>).</p>
+      <p><strong>Evento o acción a simular:</strong> Se acerca la mano al HC-SR04 externo a 10 cm, luego se retira a 50 cm; posteriormente se reduce el HC-SR04 interno a 15 cm (71%) y a 4 cm (100%).</p>
+      <p><strong>Comportamiento esperado del sistema (teórico):</strong> El servo gira a 90° con pitido de confirmación y cierra tras 4 segundos; el semáforo cambia de verde a amarillo (71%) y rojo (100%) enviando una única alerta de recolección a Telegram.</p>
+      <p><strong>Resultado observado en simulación:</strong> Servo giró a 90° (LCD <code>Tapa: ABIERTA</code>), cerró a los 4 s; en 15 cm encendió LED amarillo (71%); en 4 cm encendió LED rojo (100%), bloqueó apertura y envió la notificación HTTP 200 a Telegram.</p>
+      <p><strong>¿El sistema reaccionó correctamente?</strong> Sí.</p>
+      <p><strong>Acción de contingencia implementada:</strong> Bloqueo automático anti-desborde (&ge;95%) y notificación única por flanco a Telegram.</p>
+    </div>
+
+    <div class="fault-card">
+      <span class="pill pill-err">Escenario 2 — Falla de Sensor (Obligatorio)</span>
+      <p><strong>Nombre del escenario:</strong> Desconexión o lectura inválida del sensor ultrasónico de llenado (<code>ERR-S01</code>).</p>
+      <p><strong>Tipo:</strong> Falla de Sensor.</p>
+      <p><strong>Descripción de la condición inicial:</strong> Cesto operando normalmente al 14%, LED verde activo, switches de falla en posición normal (OFF).</p>
+      <p><strong>Evento o acción a simular:</strong> Se acciona el interruptor <code>sw_sensor</code> (GPIO 4 a LOW), simulando pérdida de eco (timeout de <code>pulseIn</code> / lectura <code>-1 cm</code>).</p>
+      <p><strong>Comportamiento esperado del sistema (teórico):</strong> El sistema debe detectar lectura inválida, cerrar la tapa en Modo Seguro, evitar falsas alertas de recolección, encender LED rojo, emitir 3 pitidos, mostrar <code>ERR-S01: SENSOR / MODO SEGURO</code> en LCD y avisar por Telegram.</p>
+      <p><strong>Resultado observado en simulación:</strong> La tapa se aseguró en 0°, el LCD mostró <code>ERR-S01: SENSOR / MODO SEGURO</code>, encendió el LED rojo, sonaron 3 pitidos y llegó la alerta única a Telegram. Al desactivar el switch se recuperó automáticamente informando el restablecimiento.</p>
+      <p><strong>¿El sistema reaccionó correctamente?</strong> Sí.</p>
+      <p><strong>Acción de contingencia implementada:</strong> Transición inmediata a Modo Seguro, bloqueo de cálculo erróneo, código de diagnóstico en pantalla (<code>ERR-S01</code>) y aviso remoto de mantenimiento.</p>
+    </div>
+
+    <div class="fault-card">
+      <span class="pill pill-err">Escenario 3 — Falla de Actuador (Obligatorio)</span>
+      <p><strong>Nombre del escenario:</strong> Servomotor de tapa trabado o sin respuesta ante orden de apertura (<code>ERR-A01</code>).</p>
+      <p><strong>Tipo:</strong> Falla de Actuador.</p>
+      <p><strong>Descripción de la condición inicial:</strong> Cesto disponible (14%, LED verde), tapa cerrada esperando presencia.</p>
+      <p><strong>Evento o acción a simular:</strong> Se activa <code>sw_tapa</code> (simulando traba mecánica / ausencia de confirmación de movimiento) y se acerca la mano a 10 cm para solicitar apertura.</p>
+      <p><strong>Comportamiento esperado del sistema (teórico):</strong> El sistema debe abortar el ciclo normal, mantener estado seguro sin forzar repetidamente el servo, encender LED rojo, mostrar <code>ERR-A01: TAPA / REVISAR SERVO</code>, sonar alarma y notificar por Telegram.</p>
+      <p><strong>Resultado observado en simulación:</strong> Al detectar la mano en 10 cm con <code>sw_tapa</code> activo, el LCD cambió a <code>ERR-A01: TAPA / REVISAR SERVO</code>, encendió el LED rojo, el Monitor Serie registró la falla y Telegram recibió la alerta única. Al destrabar el switch volvió a operación normal.</p>
+      <p><strong>¿El sistema reaccionó correctamente?</strong> Sí.</p>
+      <p><strong>Acción de contingencia implementada:</strong> Bloqueo del actuador para evitar sobrecorriente/quemado del motor, alerta audiovisual local y notificación remota.</p>
+    </div>
+
+    <div class="fault-card warn">
+      <span class="pill pill-warn">Escenario 4 — Falla de Conectividad (Bonus)</span>
+      <p><strong>Nombre del escenario:</strong> Pérdida o indisponibilidad de red Wi-Fi al arranque.</p>
+      <p><strong>Tipo:</strong> Otro (Conectividad).</p>
+      <p><strong>Descripción de la condición inicial:</strong> Arranque del ESP32 sin acceso a red Wi-Fi disponible.</p>
+      <p><strong>Evento o acción a simular:</strong> Timeout de asociación Wi-Fi tras 15 segundos de reintentos.</p>
+      <p><strong>Comportamiento esperado del sistema (teórico):</strong> El equipo no debe quedar bloqueado en un bucle infinito en <code>setup()</code>; debe conmutar a Modo Local Autónomo manteniendo sensores, servo, LCD y semáforo operativos.</p>
+      <p><strong>Resultado observado en simulación:</strong> El LCD mostró <code>Modo Local / Sin red WiFi</code> y el cesto operó normalmente todas sus funciones físicas locales sin cuelgues.</p>
+      <p><strong>¿El sistema reaccionó correctamente?</strong> Sí.</p>
+      <p><strong>Acción de contingencia implementada:</strong> Timeout no bloqueante con degradación elegante a operación autónoma local.</p>
+    </div>
+  </section>
+
+  <!-- 9. CODIGO COMENTADO -->
+  <section id="codigo">
+    <h2>9. Código Fuente Comentado (ESP32)</h2>
+    <p>
+      <em>Nota de seguridad:</em> Siguiendo las buenas prácticas de la cátedra, las credenciales de Telegram (<code>TELEGRAM_TOKEN</code> y <code>TELEGRAM_CHAT_ID</code>)
+      se muestran como placeholders en el código público y se cargan únicamente durante las pruebas privadas.
+    </p>
+<pre><code>// Smart Bin IoT — ESP32 (Wokwi-GUEST + Telegram HTTPS + Deteccion de Fallas)
+// Ver archivo completo en el repositorio: sketch.ino | Librerias: ESP32Servo, LiquidCrystal I2C
+
+#include &lt;WiFi.h&gt;
+#include &lt;WiFiClientSecure.h&gt;
+#include &lt;HTTPClient.h&gt;
+#include &lt;Wire.h&gt;
+#include &lt;LiquidCrystal_I2C.h&gt;
+#include &lt;ESP32Servo.h&gt;
+
+const char* WIFI_SSID = "Wokwi-GUEST";
+const char* WIFI_PASS = "";
+const int   WIFI_CANAL = 6;
+
+const char* TELEGRAM_TOKEN   = "PEGAR_TOKEN_AQUI";
+const char* TELEGRAM_CHAT_ID = "PEGAR_CHAT_ID_AQUI";
+bool telegramHabilitado = false;
+
+const int PIN_TRIG_MANO  = 13, PIN_ECHO_MANO  = 14;
+const int PIN_TRIG_NIVEL = 26, PIN_ECHO_NIVEL = 27;
+const int PIN_SERVO = 18, PIN_BUZZER = 19;
+const int PIN_LED_VERDE = 25, PIN_LED_AMAR = 33, PIN_LED_ROJO = 32;
+const int PIN_SW_FALLA_SENSOR = 4, PIN_SW_FALLA_TAPA = 5;
+
+const float DISTANCIA_APERTURA_CM = 20.0;
+const float ALTURA_CESTO_VACIO_CM = 40.0;
+const float ALTURA_CESTO_LLENO_CM = 5.0;
+const int   UMBRAL_MEDIO_PCT = 60, UMBRAL_LLENO_PCT = 85, UMBRAL_BLOQUEO_PCT = 95;
+const int   ANGULO_CERRADO = 0, ANGULO_ABIERTO = 90;
+const unsigned long TIEMPO_TAPA_ABIERTA_MS = 4000;
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+Servo servoTapa;
+bool tapaAbierta = false, fallaTapaActiva = false;
+bool alertaLlenoEnviada = false, alertaFallaSensorEnviada = false, alertaFallaTapaEnviada = false;
+unsigned long momentoApertura = 0;
+
+// Envio HTTPS POST a API de Telegram (con deteccion de flanco en loop)
+void enviarTelegram(const String&amp; mensaje) {
+  Serial.println("[TELEGRAM] Evento: " + mensaje);
+  if (!telegramHabilitado || WiFi.status() != WL_CONNECTED) return;
+  WiFiClientSecure cliente;
+  cliente.setInsecure(); // Solo demostracion educativa
+  HTTPClient http;
+  String url = String("https://api.telegram.org/bot") + TELEGRAM_TOKEN + "/sendMessage";
+  http.begin(cliente, url);
+  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+  String msgEnc = mensaje; msgEnc.replace(" ", "%20");
+  int httpCode = http.POST(String("chat_id=") + TELEGRAM_CHAT_ID + "&amp;text=" + msgEnc);
+  Serial.printf("[TELEGRAM] Respuesta HTTP: %d\n", httpCode);
+  http.end();
+}
+
+// Medicion ultrasonica con timeout de 30 ms para deteccion de sensor desconectado
+float medirDistanciaCm(int pinTrig, int pinEcho) {
+  digitalWrite(pinTrig, LOW);  delayMicroseconds(2);
+  digitalWrite(pinTrig, HIGH); delayMicroseconds(10);
+  digitalWrite(pinTrig, LOW);
+  unsigned long duracion = pulseIn(pinEcho, HIGH, 30000);
+  return (duracion == 0) ? -1.0 : (duracion * 0.0343) / 2.0;
+}</code></pre>
+  </section>
+
+  <!-- 10. ANALISIS DE RESULTADOS Y CONCLUSIONES -->
+  <section id="resultados">
+    <h2>10. Análisis de Resultados, Conclusiones y Mejoras Futuras</h2>
+    <div class="two-col">
+      <div class="card">
+        <h3>Análisis de Resultados</h3>
+        <ul>
+          <li><strong>Logros:</strong> Se validó la cadena completa IoT (<em>fenómeno físico &rarr; sensor &rarr; ESP32 &rarr; Wi-Fi &rarr; API Telegram &rarr; celular real</em>) con respuesta estable y cero falsos positivos.</li>
+          <li><strong>Ajustes realizados durante las pruebas:</strong> Se corrigió la polaridad inicial de los switches de falla (conectando pin 3 a GND) para arrancar en modo normal, y se agregó <code>WiFi.mode(WIFI_STA)</code> con timeout ampliado a 15 s para asegurar la obtención de IP en <code>Wokwi-GUEST</code>.</li>
+          <li><strong>Limitación de la simulación:</strong> Wokwi no reproduce ruido eléctrico, interferencia mecánica en el servo ni caídas de voltaje reales de alimentación, aspectos críticos para el pasaje a hardware físico.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Conclusiones y Hoja de Ruta (Examen Final)</h3>
+        <ul>
+          <li>El prototipo demuestra que combinar telemetría remota con mecanismos locales de Modo Seguro evita fallas silenciosas en entornos reales.</li>
+          <li><strong>Mejoras proyectadas para implementación física (Examen Final):</strong>
+            <ol>
+              <li>Montaje físico real con ESP32, HC-SR04 y Servo SG90 sobre contenedor prototipo.</li>
+              <li>Incorporación de modo <em>Deep Sleep</em> y medición de batería para extender autonomía con celdas 18650.</li>
+              <li>Validación de certificado TLS raíz (reemplazando <code>setInsecure()</code>) y fin de carrera físico real en la tapa.</li>
+            </ol>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Smart Bin IoT — Ricardo Gabriel Díaz (Legajo 29135452) | PP: Integración Tecnológica (S0D53) — Escuela Da Vinci (2026)
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.ino text eol=lf
+*.json text eol=lf
+*.html text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.png binary
