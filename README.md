@@ -16,8 +16,8 @@ Prototipo IoT desarrollado para el **Parcial 2** de la materia **PP: Integració
 3. **Conectividad IoT (Telegram):** El `ESP32` se conecta a `Wokwi-GUEST` y envía notificaciones HTTPS POST a un Bot de Telegram usando **detección de flanco** (un único aviso por cambio de estado, sin spam).
 4. **Protocolos de seguridad y fallas simuladas:**
    * **Bloqueo anti-desborde (`>= 95%`):** Impide la apertura automática cuando el contenedor está lleno.
-   * **Falla de sensor (`ERR-S01`):** Activando el switch izquierdo (`sw_sensor`), el cesto pasa a `MODO SEGURO`, cierra la tapa, enciende LED rojo, emite 3 pitidos y alerta por Telegram.
-   * **Falla de actuador (`ERR-A01`):** Activando el switch derecho (`sw_tapa`) al solicitar apertura, detecta que la tapa no respondió, bloquea el servo para evitar sobrecorriente y notifica por Telegram.
+   * **Falla de sensor:** Activando el switch izquierdo (`sw_sensor`), el cesto pasa a `MODO SEGURO`, cierra la tapa, enciende LED rojo, emite 3 pitidos y alerta por Telegram.
+   * **Falla de actuador:** Activando el switch derecho (`sw_tapa`) al solicitar apertura, detecta que la tapa no respondió, bloquea el servo para no forzarlo y notifica por Telegram.
 
 ---
 

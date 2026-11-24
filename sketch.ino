@@ -1,20 +1,18 @@
 /*
- * ============================================================================
- * PROYECTO: Smart Bin IoT — Cesto de Residuos Inteligente con Deteccion de Fallas
- * MATERIA:  PP: Integracion Tecnologica (S0D53) — Parcial 2
- * ALUMNO:   Ricardo Gabriel Diaz (Legajo 29135452) — Comision ACM5AV
- * DOCENTE:  Sebastian Suarez Cores
- * ============================================================================
- * HARDWARE:
- *  - Plataforma: ESP32 DevKit v1 (Wi-Fi Wokwi-GUEST)
- *  - Sensor 1:   HC-SR04 Externo (apertura sin contacto, <= 20 cm)
- *  - Sensor 2:   HC-SR04 Interno (medicion de % de llenado del cesto)
- *  - Actuador 1: Servomotor SG90 (tapa: 0 deg cerrada / 90 deg abierta)
- *  - Actuador 2: Pantalla LCD 16x2 I2C (estado, % llenado y codigos de error)
- *  - Actuador 3: Semaforo de 3 LEDs (Verde, Amarillo, Rojo) con R=220 ohm
- *  - Actuador 4: Buzzer (avisos sonoros y alarmas de falla)
- *  - Fallas:     2 Slide Switches (inyeccion de falla de sensor y falla de tapa)
- * ============================================================================
+ * Smart Bin IoT — Cesto de Residuos Inteligente con Deteccion de Fallas
+ * Alumno: Ricardo Gabriel Diaz (Legajo 29135452) | Comision ACM5AV
+ * Materia: PP: Integracion Tecnologica (S0D53) — Parcial 2 (Noviembre 2026)
+ * Docente: Sebastian Suarez Cores
+ *
+ * Componentes:
+ * - ESP32 DevKit v1 (WiFi Wokwi-GUEST)
+ * - Sensor 1: HC-SR04 externo (apertura sin contacto, <= 20 cm)
+ * - Sensor 2: HC-SR04 interno (medicion de nivel de llenado)
+ * - Actuador 1: Servo SG90 (tapa: 0° cerrada / 90° abierta)
+ * - Actuador 2: LCD 16x2 I2C (direccion 0x27)
+ * - Actuador 3: Semaforo 3 LEDs (Verde, Amarillo, Rojo con R=220 ohm)
+ * - Actuador 4: Buzzer (avisos sonoros)
+ * - Simulacion de fallas: 2 slide switches (sensor desconectado y servo trabado)
  */
 
 #include <WiFi.h>
@@ -24,22 +22,22 @@
 #include <LiquidCrystal_I2C.h>
 #include <ESP32Servo.h>
 
-// ===================== CONFIGURACION WI-FI Y TELEGRAM =====================
+// --- Configuracion de red y Telegram ---
 const char* WIFI_SSID = "Wokwi-GUEST";
 const char* WIFI_PASS = "";
 const int   WIFI_CANAL = 6;
 
-// Reemplazar con credenciales reales antes de la demo (NO subir token publico)
+// Credenciales para el bot de Telegram (se cargan antes de probar)
 const char* TELEGRAM_TOKEN   = "PEGAR_TOKEN_AQUI";
 const char* TELEGRAM_CHAT_ID = "PEGAR_CHAT_ID_AQUI";
-bool telegramHabilitado = false; // Se activa automaticamente si se carga un token valido
+bool telegramHabilitado = false;
 
-// ===================== DEFINICION DE PINES (ESP32) =====================
-// Sensor 1: HC-SR04 Externo (mano del usuario)
+// --- Pines ESP32 ---
+// HC-SR04 externo (deteccion de mano)
 const int PIN_TRIG_MANO  = 13;
 const int PIN_ECHO_MANO  = 14;
 
-// Sensor 2: HC-SR04 Interno (nivel de llenado)
+// HC-SR04 interno (nivel de residuos)
 const int PIN_TRIG_NIVEL = 26;
 const int PIN_ECHO_NIVEL = 27;
 
@@ -50,37 +48,35 @@ const int PIN_LED_VERDE  = 25;
 const int PIN_LED_AMAR   = 33;
 const int PIN_LED_ROJO   = 32;
 
-// Interruptores de simulacion de fallas (activos en LOW por INPUT_PULLUP)
-const int PIN_SW_FALLA_SENSOR = 4;  // Simula sensor de llenado desconectado/invalido
-const int PIN_SW_FALLA_TAPA   = 5;  // Simula servo de tapa trabado/sin respuesta
+// Interruptores para simular fallas en Wokwi (activos en LOW con INPUT_PULLUP)
+const int PIN_SW_FALLA_SENSOR = 4;  // Simula sensor desconectado
+const int PIN_SW_FALLA_TAPA   = 5;  // Simula servo atascado
 
-// ===================== PARAMETROS DEL CESTO =====================
-const float DISTANCIA_APERTURA_CM = 20.0; // Abre la tapa si la mano esta a <= 20 cm
-const float ALTURA_CESTO_VACIO_CM = 40.0; // Distancia sensor->fondo (0% lleno)
-const float ALTURA_CESTO_LLENO_CM = 5.0;  // Distancia sensor->tope (100% lleno)
+// --- Parametros y calibracion del cesto ---
+const float DISTANCIA_APERTURA_CM = 20.0; // Abre a 20 cm o menos
+const float ALTURA_CESTO_VACIO_CM = 40.0; // Distancia al fondo = 0% lleno
+const float ALTURA_CESTO_LLENO_CM = 5.0;  // Distancia al tope = 100% lleno
 const int   UMBRAL_MEDIO_PCT      = 60;   // Amarillo desde 60%
-const int   UMBRAL_LLENO_PCT      = 85;   // Rojo + Alerta Telegram desde 85%
-const int   UMBRAL_BLOQUEO_PCT    = 95;   // Bloqueo anti-desborde desde 95%
+const int   UMBRAL_LLENO_PCT      = 85;   // Rojo y alerta Telegram desde 85%
+const int   UMBRAL_BLOQUEO_PCT    = 95;   // Bloqueo de apertura desde 95%
 const int   ANGULO_CERRADO        = 0;
 const int   ANGULO_ABIERTO        = 90;
 const unsigned long TIEMPO_TAPA_ABIERTA_MS = 4000;
 
-// ===================== OBJETOS Y VARIABLES DE ESTADO =====================
+// --- Variables y objetos ---
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 Servo servoTapa;
 
 bool tapaAbierta = false;
 unsigned long momentoApertura = 0;
 
-// Banderas de deteccion de flanco (anti-spam para Telegram, segun guia de catedra)
+// Banderas para avisar por Telegram solo en el flanco (no spamear en cada loop)
 bool alertaLlenoEnviada       = false;
 bool alertaFallaSensorEnviada = false;
 bool alertaFallaTapaEnviada   = false;
 bool fallaTapaActiva          = false;
 
-// ===================== FUNCIONES AUXILIARES =====================
-
-// Convierte espacios a %20 para envio seguro por HTTP POST a Telegram
+// Reemplaza espacios y saltos para armar la URL del bot
 String codificarURL(const String& texto) {
   String out = "";
   for (size_t i = 0; i < texto.length(); i++) {
@@ -92,21 +88,21 @@ String codificarURL(const String& texto) {
   return out;
 }
 
-// Envia notificacion por Telegram usando WiFiClientSecure + HTTPClient (guia catedra)
+// Envia un mensaje por HTTPS a la API de Telegram
 void enviarTelegram(const String& mensaje) {
-  Serial.println("[TELEGRAM] Evento: " + mensaje);
+  Serial.println("[TELEGRAM] " + mensaje);
 
   if (!telegramHabilitado) {
-    Serial.println("[TELEGRAM] Modo demo local (cargar TOKEN y CHAT_ID para envio real).");
+    Serial.println("[TELEGRAM] Modo local (falta cargar TOKEN y CHAT_ID).");
     return;
   }
   if (WiFi.status() != WL_CONNECTED) {
-    Serial.println("[TELEGRAM] Sin conexion Wi-Fi. Operando en modo local autonomo.");
+    Serial.println("[TELEGRAM] Sin conexion WiFi, se omite el envio.");
     return;
   }
 
   WiFiClientSecure cliente;
-  cliente.setInsecure(); // Solo demostracion educativa (en prod validar certificado TLS)
+  cliente.setInsecure(); // No usamos certificados raiz para no saturar memoria en el ESP32
   HTTPClient http;
   String url = String("https://api.telegram.org/bot") + TELEGRAM_TOKEN + "/sendMessage";
 
@@ -119,7 +115,7 @@ void enviarTelegram(const String& mensaje) {
   http.end();
 }
 
-// Lee distancia en cm de un sensor ultrasonico HC-SR04 con timeout de seguridad
+// Mide distancia en cm; si timeout (sensor desconectado) devuelve -1.0
 float medirDistanciaCm(int pinTrig, int pinEcho) {
   digitalWrite(pinTrig, LOW);
   delayMicroseconds(2);
@@ -127,15 +123,14 @@ float medirDistanciaCm(int pinTrig, int pinEcho) {
   delayMicroseconds(10);
   digitalWrite(pinTrig, LOW);
 
-  // Timeout de 30 ms (~500 cm max) para evitar bloqueo del loop si el sensor falla
+  // Timeout de 30 ms para no colgar el loop si el sensor no devuelve eco
   unsigned long duracion = pulseIn(pinEcho, HIGH, 30000);
   if (duracion == 0) {
-    return -1.0; // Codigo de error: sin eco / sensor desconectado
+    return -1.0;
   }
   return (duracion * 0.0343) / 2.0;
 }
 
-// Emite pitidos cortos con el buzzer
 void emitirPitidos(int cantidad, int duracionMs) {
   for (int i = 0; i < cantidad; i++) {
     tone(PIN_BUZZER, 1200, duracionMs);
@@ -143,14 +138,12 @@ void emitirPitidos(int cantidad, int duracionMs) {
   }
 }
 
-// Control del semaforo de 3 LEDs
 void actualizarSemaforo(bool verde, bool amarillo, bool rojo) {
   digitalWrite(PIN_LED_VERDE, verde ? HIGH : LOW);
   digitalWrite(PIN_LED_AMAR,  amarillo ? HIGH : LOW);
   digitalWrite(PIN_LED_ROJO,  rojo ? HIGH : LOW);
 }
 
-// Muestra dos lineas limpias en el LCD 16x2
 void mostrarLCD(const String& linea1, const String& linea2) {
   lcd.setCursor(0, 0);
   lcd.print(linea1);
@@ -161,47 +154,47 @@ void mostrarLCD(const String& linea1, const String& linea2) {
   for (int i = linea2.length(); i < 16; i++) lcd.print(' ');
 }
 
-// ===================== SETUP =====================
 void setup() {
   Serial.begin(115200);
-  Serial.println("\n=== INICIANDO SMART BIN IoT (ESP32) ===");
+  Serial.println("\n--- Iniciando Smart Bin IoT ---");
 
-  // Configurar pines de sensores ultrasonicos
+  // Pines de sensores
   pinMode(PIN_TRIG_MANO,  OUTPUT);
   pinMode(PIN_ECHO_MANO,  INPUT);
   pinMode(PIN_TRIG_NIVEL, OUTPUT);
   pinMode(PIN_ECHO_NIVEL, INPUT);
 
-  // Configurar pines de actuadores
+  // Pines de actuadores
   pinMode(PIN_LED_VERDE, OUTPUT);
   pinMode(PIN_LED_AMAR,  OUTPUT);
   pinMode(PIN_LED_ROJO,  OUTPUT);
   pinMode(PIN_BUZZER,    OUTPUT);
 
-  // Configurar switches de simulacion de fallas
+  // Switches para inyectar fallas
   pinMode(PIN_SW_FALLA_SENSOR, INPUT_PULLUP);
   pinMode(PIN_SW_FALLA_TAPA,   INPUT_PULLUP);
 
-  // Inicializar LCD I2C (SDA=21, SCL=22 por defecto en ESP32)
+  // LCD por bus I2C (SDA=21, SCL=22)
   Wire.begin(21, 22);
   lcd.init();
   lcd.backlight();
   mostrarLCD("Smart Bin IoT", "Iniciando...");
 
-  // Inicializar Servo en posicion cerrada
+  // Posicion inicial del servo (tapa cerrada)
   servoTapa.attach(PIN_SERVO, 500, 2400);
   servoTapa.write(ANGULO_CERRADO);
 
-  // Verificar si se cargaron credenciales reales de Telegram
+  // Si se pegaron credenciales reales habilitamos Telegram
   if (String(TELEGRAM_TOKEN) != "PEGAR_TOKEN_AQUI" && String(TELEGRAM_CHAT_ID) != "PEGAR_CHAT_ID_AQUI") {
     telegramHabilitado = true;
   }
 
-  // Conectar a Wi-Fi virtual Wokwi-GUEST (canal 6) con timeout de 15 segundos
+  // Conexion WiFi a Wokwi-GUEST con timeout para que no quede clavado
   mostrarLCD("Conectando WiFi", "Wokwi-GUEST...");
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASS, WIFI_CANAL);
-  Serial.print("Conectando a Wokwi-GUEST");
+  Serial.print("Buscando red WiFi");
+
   int intentos = 0;
   while (WiFi.status() != WL_CONNECTED && intentos < 60) {
     delay(250);
@@ -210,73 +203,70 @@ void setup() {
   }
 
   if (WiFi.status() == WL_CONNECTED) {
-    Serial.print("\nWi-Fi conectado! IP: ");
+    Serial.print("\nWiFi conectado. IP: ");
     Serial.println(WiFi.localIP());
-    mostrarLCD("WiFi Conectado", WiFi.localIP().toString());
-    enviarTelegram("Smart Bin IoT iniciado y conectado a la red.");
+    mostrarLCD("WiFi OK", WiFi.localIP().toString());
+    enviarTelegram("Smart Bin IoT conectado y listo.");
   } else {
-    Serial.println("\nSin Wi-Fi. Iniciando en modo autonomo local.");
-    mostrarLCD("Modo Local", "Sin red WiFi");
+    Serial.println("\nSin WiFi. Funciona en modo autonomo local.");
+    mostrarLCD("Modo Local", "Sin conexion");
   }
   delay(1200);
 }
 
-// ===================== LOOP PRINCIPAL =====================
 void loop() {
-  // 1. Leer estado de interruptores de inyeccion de fallas (LOW = falla activa)
+  // 1. Verificamos si estan activos los switches de falla (LOW por pull-up)
   bool simularFallaSensor = (digitalRead(PIN_SW_FALLA_SENSOR) == LOW);
   bool simularFallaTapa   = (digitalRead(PIN_SW_FALLA_TAPA)   == LOW);
 
-  // 2. Medir distancia interna (llenado) y externa (mano)
+  // 2. Leemos distancias de ambos sensores
   float distNivel = simularFallaSensor ? -1.0 : medirDistanciaCm(PIN_TRIG_NIVEL, PIN_ECHO_NIVEL);
   float distMano  = medirDistanciaCm(PIN_TRIG_MANO, PIN_ECHO_MANO);
 
-  // ---------------- ESCENARIO DE FALLA 1: SENSOR DE LLENADO ----------------
+  // --- Falla 1: Sensor de llenado desconectado o sin lectura ---
   if (distNivel < 0 || distNivel > 400.0) {
-    // Modo seguro: cerrar tapa, prender LED rojo, avisar en LCD y Telegram (1 sola vez)
     servoTapa.write(ANGULO_CERRADO);
     tapaAbierta = false;
     actualizarSemaforo(false, false, true);
-    mostrarLCD("ERR-S01: SENSOR", "MODO SEGURO");
-    Serial.println("[FALLA] ERR-S01: Sensor interno sin respuesta o lectura invalida.");
+    mostrarLCD("ERR: SENSOR", "MODO SEGURO");
+    Serial.println("[FALLA] Sensor de nivel sin lectura valida.");
 
     if (!alertaFallaSensorEnviada) {
       emitirPitidos(3, 120);
-      enviarTelegram("ALERTA ERR-S01: Falla en sensor de llenado. Cesto en Modo Seguro.");
+      enviarTelegram("ALERTA: Falla en sensor de nivel. Cesto en Modo Seguro.");
       alertaFallaSensorEnviada = true;
     }
     delay(500);
     return;
   } else if (alertaFallaSensorEnviada) {
-    // Recuperacion automatica del sensor
     alertaFallaSensorEnviada = false;
-    enviarTelegram("INFO: Sensor de llenado restablecido correctamente.");
+    enviarTelegram("INFO: Sensor de nivel normalizado.");
   }
 
-  // 3. Calcular porcentaje de llenado (0% = 40 cm, 100% = 5 cm)
-  float porcentajeFloat = ((ALTURA_CESTO_VACIO_CM - distNivel) / (ALTURA_CESTO_VACIO_CM - ALTURA_CESTO_LLENO_CM)) * 100.0;
-  int porcentaje = constrain((int)round(porcentajeFloat), 0, 100);
+  // 3. Calculo de porcentaje de llenado (40 cm = 0%, 5 cm = 100%)
+  float pctFloat = ((ALTURA_CESTO_VACIO_CM - distNivel) / (ALTURA_CESTO_VACIO_CM - ALTURA_CESTO_LLENO_CM)) * 100.0;
+  int porcentaje = constrain((int)round(pctFloat), 0, 100);
 
-  // ---------------- ESCENARIO DE FALLA 2: ACTUADOR (TAPA ATASCADA) ----------------
+  // --- Falla 2: Restablecimiento de servo si se destraba el switch ---
   if (!simularFallaTapa && fallaTapaActiva) {
     fallaTapaActiva = false;
     alertaFallaTapaEnviada = false;
-    enviarTelegram("INFO: Actuador de tapa restablecido.");
+    enviarTelegram("INFO: Servo de tapa restablecido.");
   }
 
   if (fallaTapaActiva) {
     actualizarSemaforo(false, false, true);
-    mostrarLCD("ERR-A01: TAPA", "REVISAR SERVO");
+    mostrarLCD("ERR: TAPA", "REVISAR SERVO");
     delay(500);
     return;
   }
 
-  // 4. Evaluar semaforo y alerta de recoleccion por Telegram (deteccion de flanco)
+  // 4. Semáforo y notificacion de llenado por Telegram
   if (porcentaje >= UMBRAL_LLENO_PCT) {
     actualizarSemaforo(false, false, true);
     if (!alertaLlenoEnviada) {
       emitirPitidos(2, 150);
-      enviarTelegram("ALERTA RECOLECCION: Contenedor al " + String(porcentaje) + "% de capacidad.");
+      enviarTelegram("ALERTA: Cesto al " + String(porcentaje) + "% de capacidad. Requiere vaciado.");
       alertaLlenoEnviada = true;
     }
   } else if (porcentaje >= UMBRAL_MEDIO_PCT) {
@@ -286,57 +276,57 @@ void loop() {
     actualizarSemaforo(true, false, false);
     if (alertaLlenoEnviada) {
       alertaLlenoEnviada = false;
-      enviarTelegram("INFO: Contenedor vaciado (" + String(porcentaje) + "%). Disponible.");
+      enviarTelegram("INFO: Cesto vaciado (" + String(porcentaje) + "%).");
     }
   }
 
-  // 5. Logica de apertura automatica de tapa sin contacto
+  // 5. Apertura automatica sin contacto
   if (!tapaAbierta && distMano > 0 && distMano <= DISTANCIA_APERTURA_CM) {
     if (porcentaje >= UMBRAL_BLOQUEO_PCT) {
-      // Proteccion anti-desborde: no abre si esta al >= 95%
-      mostrarLCD("LLENO: " + String(porcentaje) + "%", "BLOQUEO DESBORDE");
+      // Si esta al 95% o mas, no abre para evitar desborde
+      mostrarLCD("LLENO: " + String(porcentaje) + "%", "NO ABRE TAPA");
       emitirPitidos(2, 80);
-      Serial.println("[SEGURIDAD] Apertura bloqueada: cesto lleno.");
+      Serial.println("[AVISO] Apertura bloqueada por capacidad maxima.");
     } else if (simularFallaTapa) {
-      // Inyeccion de falla de actuador: intenta abrir pero el servo esta trabado
+      // Simula traba del servo al intentar abrir
       fallaTapaActiva = true;
       actualizarSemaforo(false, false, true);
-      mostrarLCD("ERR-A01: TAPA", "REVISAR SERVO");
-      Serial.println("[FALLA] ERR-A01: El actuador de tapa no respondio a la orden de apertura.");
+      mostrarLCD("ERR: TAPA", "REVISAR SERVO");
+      Serial.println("[FALLA] El servo no respondio a la orden de apertura.");
       if (!alertaFallaTapaEnviada) {
         emitirPitidos(3, 180);
-        enviarTelegram("ALERTA ERR-A01: Tapa atascada o falla de servomotor.");
+        enviarTelegram("ALERTA: Tapa trabada o falla de servo al intentar abrir.");
         alertaFallaTapaEnviada = true;
       }
       return;
     } else {
-      // Funcionamiento normal: abrir tapa
+      // Apertura normal
       servoTapa.write(ANGULO_ABIERTO);
       tapaAbierta = true;
       momentoApertura = millis();
       tone(PIN_BUZZER, 1000, 100);
-      Serial.println("[OK] Mano detectada -> Tapa ABIERTA.");
+      Serial.println("[OK] Mano detectada -> Tapa abierta.");
     }
   }
 
-  // 6. Cierre automatico tras TIEMPO_TAPA_ABIERTA_MS (solo si la mano ya se retiro)
+  // 6. Cierre automatico a los 4 segundos si la mano ya no esta
   if (tapaAbierta && (millis() - momentoApertura >= TIEMPO_TAPA_ABIERTA_MS)) {
     if (distMano < 0 || distMano > DISTANCIA_APERTURA_CM) {
       servoTapa.write(ANGULO_CERRADO);
       tapaAbierta = false;
-      Serial.println("[OK] Tiempo cumplido -> Tapa CERRADA.");
+      Serial.println("[OK] Tiempo cumplido -> Tapa cerrada.");
     }
   }
 
-  // 7. Actualizar display LCD y Monitor Serie
+  // 7. Visualizacion en LCD y Monitor Serie
   String estadoTapa = tapaAbierta ? "Tapa: ABIERTA" : (porcentaje >= UMBRAL_BLOQUEO_PCT ? "LLENO - BLOQUEO" : "Tapa: CERRADA");
   mostrarLCD("Llenado: " + String(porcentaje) + "%", estadoTapa);
 
-  Serial.print("Nivel: ");
-  Serial.print(distNivel, 1);
-  Serial.print(" cm (");
+  Serial.print("Llenado: ");
   Serial.print(porcentaje);
-  Serial.print("%) | Mano: ");
+  Serial.print("% (");
+  Serial.print(distNivel, 1);
+  Serial.print(" cm) | Mano: ");
   Serial.print(distMano, 1);
   Serial.print(" cm | ");
   Serial.println(estadoTapa);
