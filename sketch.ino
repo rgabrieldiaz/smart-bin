@@ -1,6 +1,6 @@
 /*
  * Smart Bin IoT — Cesto de Residuos Inteligente con Deteccion de Fallas
- * Alumno: Ricardo Gabriel Diaz (Legajo 29135452) | Comision ACM5AV
+ * Alumno: Ricardo Gabriel Diaz | Comision ACM5AV
  * Materia: PP: Integracion Tecnologica (S0D53) — Parcial 2 (Noviembre 2026)
  * Docente: Sebastian Suarez Cores
  *

@@ -77,18 +77,27 @@
       background: rgba(15, 23, 42, 0.95);
       backdrop-filter: blur(8px);
       border-bottom: 1px solid var(--border);
-      padding: 0.6rem 0;
-      overflow-x: auto;
-      white-space: nowrap;
+      padding: 0.65rem 0;
+    }
+    nav.toc .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1.1rem;
+      align-items: center;
     }
     nav.toc a {
-      display: inline-block;
       color: var(--muted);
-      font-size: 0.84rem;
-      margin-right: 1.1rem;
+      font-size: 0.83rem;
       font-weight: 500;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      transition: color 0.15s ease, background 0.15s ease;
     }
-    nav.toc a:hover { color: #fff; }
+    nav.toc a:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+      text-decoration: none;
+    }
     main { padding: 2rem 0 4rem; }
     section {
       background: var(--surface);
@@ -217,7 +226,7 @@
       semáforo en pantalla LCD y envío de alertas a un Bot de Telegram ante llenado crítico o fallas de componentes.
     </p>
     <div class="meta-grid">
-      <div class="meta-card"><strong>Estudiante</strong>Ricardo Gabriel Díaz (Legajo 29135452)</div>
+      <div class="meta-card"><strong>Estudiante</strong>Ricardo Gabriel Díaz</div>
       <div class="meta-card"><strong>Materia / Comisión</strong>PP: Integración Tecnológica (S0D53) — ACM5AV</div>
       <div class="meta-card"><strong>Docente</strong>Sebastián Suárez Cores</div>
       <div class="meta-card"><strong>Institución / Fecha</strong>Escuela Da Vinci — Noviembre 2026</div>
@@ -668,7 +677,7 @@
       A continuación se incluye el código cargado en Wokwi. Por seguridad, los tokens de acceso al bot de Telegram se muestran como etiquetas y se cargan al momento de realizar la prueba:
     </p>
 <pre><code>// Smart Bin IoT — Cesto de Residuos Inteligente con Deteccion de Fallas
-// Alumno: Ricardo Gabriel Diaz (Legajo 29135452) | Comision ACM5AV
+// Alumno: Ricardo Gabriel Diaz | Comision ACM5AV
 // Materia: PP: Integracion Tecnologica (S0D53) — Parcial 2
 
 #include &lt;WiFi.h&gt;
@@ -758,7 +767,7 @@ float medirDistanciaCm(int pinTrig, int pinEcho) {
 </main>
 
 <footer>
-  Smart Bin IoT — Ricardo Gabriel Díaz (Legajo 29135452) | PP: Integración Tecnológica (S0D53) — Escuela Da Vinci (2026)
+  Smart Bin IoT — Ricardo Gabriel Díaz | PP: Integración Tecnológica (S0D53) — Escuela Da Vinci (2026)
 </footer>
 
 </body>

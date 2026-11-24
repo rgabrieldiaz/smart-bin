@@ -2,7 +2,7 @@
 
 Prototipo IoT desarrollado para el **Parcial 2** de la materia **PP: Integración Tecnológica (S0D53)** — Analista de Sistemas, Escuela Da Vinci.
 
-* **Estudiante:** Ricardo Gabriel Díaz (Legajo `29135452`) — Comisión `ACM5AV`
+* **Estudiante:** Ricardo Gabriel Díaz — Comisión `ACM5AV`
 * **Docente:** Sebastián Suárez Cores
 * **Simulador Wokwi en vivo:** https://wokwi.com/projects/481600182431364097
 * **Informe Técnico (Landing Page):** https://rgabrieldiaz.github.io/smart-bin-iot/
