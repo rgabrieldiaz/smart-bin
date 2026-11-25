@@ -1,5 +1,5 @@
 /*
- * Smart Bin IoT — Cesto de Residuos Inteligente con Deteccion de Fallas
+ * Smart Bin — Cesto de Residuos Inteligente con Deteccion de Fallas
  * Alumno: Ricardo Gabriel Diaz | Comision ACM5AV
  * Materia: PP: Integracion Tecnologica (S0D53) — Parcial 2 (Noviembre 2026)
  * Docente: Sebastian Suarez Cores
@@ -156,7 +156,7 @@ void mostrarLCD(const String& linea1, const String& linea2) {
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("\n--- Iniciando Smart Bin IoT ---");
+  Serial.println("\n--- Iniciando Smart Bin ---");
 
   // Pines de sensores
   pinMode(PIN_TRIG_MANO,  OUTPUT);
@@ -178,7 +178,7 @@ void setup() {
   Wire.begin(21, 22);
   lcd.init();
   lcd.backlight();
-  mostrarLCD("Smart Bin IoT", "Iniciando...");
+  mostrarLCD("Smart Bin", "Iniciando...");
 
   // Posicion inicial del servo (tapa cerrada)
   servoTapa.attach(PIN_SERVO, 500, 2400);
@@ -206,7 +206,7 @@ void setup() {
     Serial.print("\nWiFi conectado. IP: ");
     Serial.println(WiFi.localIP());
     mostrarLCD("WiFi OK", WiFi.localIP().toString());
-    enviarTelegram("Smart Bin IoT conectado y listo.");
+    enviarTelegram("Smart Bin conectado y listo.");
   } else {
     Serial.println("\nSin WiFi. Funciona en modo autonomo local.");
     mostrarLCD("Modo Local", "Sin conexion");

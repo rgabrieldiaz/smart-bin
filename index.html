@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="artifact-type" content="narrative">
   <meta name="design-style" content="showroom">
-  <title>Smart Bin IoT — Cesto de Residuos Inteligente sobre ESP32</title>
+  <title>Smart Bin — Cesto de Residuos Inteligente sobre ESP32</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -1086,7 +1086,7 @@
 <body>
   <header class="top-nav">
     <div class="container top-nav-inner">
-      <span class="brand-mark">Smart Bin IoT</span>
+      <span class="brand-mark">Smart Bin</span>
       <nav class="nav-links" aria-label="Navegación principal">
         <a href="#simulador">Simulador en vivo</a>
         <a href="#arquitectura">Arquitectura</a>
@@ -1149,7 +1149,7 @@
             En oficinas, aulas y pasillos compartidos, los cestos tradicionales arrastran dos fallas cotidianas: la incomodidad higiénica de tocar o empujar la tapa con la mano, y el desborde silencioso que ocurre cuando nadie advierte que la bolsa se llenó hasta que los residuos caen al piso.
           </p>
           <p>
-            <strong>Smart Bin IoT</strong> resuelve ambos problemas integrando dos sensores ultrasónicos HC-SR04 sobre un microcontrolador <strong>ESP32 DevKit v1</strong>. El sensor exterior abre la tapa de 0° a 90° en milisegundos sin contacto físico; el sensor interior mide la altura de la basura para actualizar un semáforo LED, una pantalla LCD I2C y un bot de Telegram antes de que el contenedor colapse.
+            <strong>Smart Bin</strong> resuelve ambos problemas integrando dos sensores ultrasónicos HC-SR04 sobre un microcontrolador <strong>ESP32 DevKit v1</strong>. El sensor exterior abre la tapa de 0° a 90° en milisegundos sin contacto físico; el sensor interior mide la altura de la basura para actualizar un semáforo LED, una pantalla LCD I2C y un bot de Telegram antes de que el contenedor colapse.
           </p>
         </div>
       </div>
@@ -1224,7 +1224,7 @@
           <!-- Hardware Twin Tile -->
           <div class="tile twin-stage">
             <div class="bin-svg-wrap">
-              <svg viewBox="0 -85 340 315" aria-label="Representación interactiva del cesto inteligente Smart Bin IoT">
+              <svg viewBox="0 -85 340 315" aria-label="Representación interactiva del cesto inteligente Smart Bin">
                 <!-- Hand & Ultrasonic Waves -->
                 <g id="svg-hand-group" opacity="0.35">
                   <rect x="26" y="40" width="46" height="18" rx="9" fill="var(--on-surface-variant)"></rect>
@@ -1769,7 +1769,7 @@ Tapa: CERRADA   </div>
                 </span>
                 <button type="button" class="btn-secondary" id="copy-code-btn" onclick="copyFirmwareCode()">Copiar código</button>
               </div>
-              <pre class="code-block" id="firmware-code">// Smart Bin IoT — Cesto de Residuos Inteligente con Deteccion de Fallas
+              <pre class="code-block" id="firmware-code">// Smart Bin — Cesto de Residuos Inteligente con Deteccion de Fallas
 // Alumno: Ricardo Gabriel Diaz | Comision ACM5AV
 #include &lt;WiFi.h&gt;
 #include &lt;WiFiClientSecure.h&gt;
@@ -1860,7 +1860,7 @@ float medirDistanciaCm(int pinTrig, int pinEcho) {
 
   <footer>
     <div class="container">
-      <p><strong>Smart Bin IoT</strong> — Proyecto académico de Parcial 2 (Modalidad Simulada con Detección de Fallas)</p>
+      <p><strong>Smart Bin</strong> — Proyecto académico de Parcial 2 (Modalidad Simulada con Detección de Fallas)</p>
       <p>Autor: <strong>Ricardo Gabriel Díaz</strong> · Comisión ACM5AV · Materia: PP: Integración Tecnológica (S0D53) · Docente: Sebastián Suárez Cores · Escuela Da Vinci · Noviembre 2026 · <a href="https://wokwi.com/projects/481600182431364097" target="_blank" rel="noopener">Simulador Wokwi (ID 481600182431364097)</a> · <a href="https://github.com/rgabrieldiaz/smart-bin" target="_blank" rel="noopener">Repositorio en GitHub</a></p>
     </div>
   </footer>

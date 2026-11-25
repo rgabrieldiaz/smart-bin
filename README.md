@@ -1,4 +1,4 @@
-# Smart Bin IoT — Cesto de Residuos Inteligente (ESP32)
+# Smart Bin — Cesto de Residuos Inteligente (ESP32)
 
 Prototipo IoT desarrollado para el **Parcial 2** de la materia **PP: Integración Tecnológica (S0D53)** — Analista de Sistemas, Escuela Da Vinci.
 
