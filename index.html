@@ -1039,7 +1039,7 @@
 
     footer p {
       margin: var(--space-xs) auto;
-      max-width: 65ch;
+      max-width: 900px;
     }
 
     /* Responsive adjustments */
@@ -1646,9 +1646,9 @@ Tapa: CERRADA   </div>
       <div class="container">
         <div class="headline-stack">
           <span class="eyebrow">Gestión, presupuesto y firmware</span>
-          <h2>De la arquitectura al prototipo validado en 37 horas.</h2>
+          <h2>Planificación del desarrollo, presupuesto y firmware.</h2>
           <p class="lede">
-            Cronograma ejecutado entre el 18 y el 25 de noviembre de 2026, presupuesto local de materiales y código C++ comentado cargado en Wokwi.
+            Distribución temporal estimada de actividades del proyecto, presupuesto de materiales en ARS y código fuente estructurado en C++.
           </p>
         </div>
 
@@ -1656,42 +1656,42 @@ Tapa: CERRADA   </div>
           <!-- Gantt -->
           <div class="tile">
             <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:var(--space-md);">
-              <h3 style="font-family:var(--font-headline); font-size:1.35rem; margin:0; letter-spacing:-0.02em;">Diagrama de Gantt (18/11 – 25/11)</h3>
+              <h3 style="font-family:var(--font-headline); font-size:1.35rem; margin:0; letter-spacing:-0.02em;">Diagrama de Gantt (Planificación temporal)</h3>
               <span class="chip positive">7 etapas · 37 hs</span>
             </div>
             <div class="gantt-list">
               <div class="gantt-row">
-                <div><strong>1. Problema y componentes</strong><div style="font-size:0.8125rem; color:var(--on-surface-variant);">18/11 – 20/11</div></div>
+                <div><strong>1. Problema y componentes</strong><div style="font-size:0.8125rem; color:var(--on-surface-variant);">Fase 1 · Días 1 a 3</div></div>
                 <div class="gantt-track"><div class="gantt-bar" style="left:0%; width:32%;"></div></div>
                 <div class="mono" style="text-align:right;">6 hs</div>
               </div>
               <div class="gantt-row">
-                <div><strong>2. Circuito en Wokwi</strong><div style="font-size:0.8125rem; color:var(--on-surface-variant);">21/11 – 22/11</div></div>
+                <div><strong>2. Circuito en Wokwi</strong><div style="font-size:0.8125rem; color:var(--on-surface-variant);">Fase 2 · Días 4 y 5</div></div>
                 <div class="gantt-track"><div class="gantt-bar" style="left:32%; width:24%;"></div></div>
                 <div class="mono" style="text-align:right;">8 hs</div>
               </div>
               <div class="gantt-row">
-                <div><strong>3. Lógica base y LCD</strong><div style="font-size:0.8125rem; color:var(--on-surface-variant);">23/11</div></div>
+                <div><strong>3. Lógica base y LCD</strong><div style="font-size:0.8125rem; color:var(--on-surface-variant);">Fase 3 · Día 6</div></div>
                 <div class="gantt-track"><div class="gantt-bar" style="left:56%; width:12%;"></div></div>
                 <div class="mono" style="text-align:right;">6 hs</div>
               </div>
               <div class="gantt-row">
-                <div><strong>4. Wi-Fi y Bot Telegram</strong><div style="font-size:0.8125rem; color:var(--on-surface-variant);">23/11 – 24/11</div></div>
+                <div><strong>4. Wi-Fi y Bot Telegram</strong><div style="font-size:0.8125rem; color:var(--on-surface-variant);">Fase 4 · Días 6 y 7</div></div>
                 <div class="gantt-track"><div class="gantt-bar" style="left:62%; width:16%;"></div></div>
                 <div class="mono" style="text-align:right;">5 hs</div>
               </div>
               <div class="gantt-row">
-                <div><strong>5. Simulación de fallas</strong><div style="font-size:0.8125rem; color:var(--on-surface-variant);">24/11</div></div>
+                <div><strong>5. Simulación de fallas</strong><div style="font-size:0.8125rem; color:var(--on-surface-variant);">Fase 5 · Día 7</div></div>
                 <div class="gantt-track"><div class="gantt-bar alt-color" style="left:75%; width:10%;"></div></div>
                 <div class="mono" style="text-align:right;">4 hs</div>
               </div>
               <div class="gantt-row">
-                <div><strong>6. Consumo y presupuesto</strong><div style="font-size:0.8125rem; color:var(--on-surface-variant);">24/11</div></div>
+                <div><strong>6. Consumo y presupuesto</strong><div style="font-size:0.8125rem; color:var(--on-surface-variant);">Fase 6 · Día 7</div></div>
                 <div class="gantt-track"><div class="gantt-bar alt-color" style="left:82%; width:8%;"></div></div>
                 <div class="mono" style="text-align:right;">3 hs</div>
               </div>
               <div class="gantt-row">
-                <div><strong>7. Informe y defensa oral</strong><div style="font-size:0.8125rem; color:var(--on-surface-variant);">24/11 – 25/11</div></div>
+                <div><strong>7. Informe y defensa oral</strong><div style="font-size:0.8125rem; color:var(--on-surface-variant);">Fase 7 · Días 7 y 8</div></div>
                 <div class="gantt-track"><div class="gantt-bar" style="left:88%; width:12%;"></div></div>
                 <div class="mono" style="text-align:right;">5 hs</div>
               </div>
@@ -1861,7 +1861,7 @@ float medirDistanciaCm(int pinTrig, int pinEcho) {
   <footer>
     <div class="container">
       <p><strong>Smart Bin</strong> — Proyecto académico de Parcial 2 (Modalidad Simulada con Detección de Fallas)</p>
-      <p>Autor: <strong>Ricardo Gabriel Díaz</strong> · Comisión ACM5AV · Materia: PP: Integración Tecnológica (S0D53) · Docente: Sebastián Suárez Cores · Escuela Da Vinci · Noviembre 2026 · <a href="https://wokwi.com/projects/481600182431364097" target="_blank" rel="noopener">Simulador Wokwi (ID 481600182431364097)</a> · <a href="https://github.com/rgabrieldiaz/smart-bin" target="_blank" rel="noopener">Repositorio en GitHub</a></p>
+      <p>Autor: <strong>Ricardo Gabriel Díaz</strong> · Comisión ACM5AV · Materia: PP: Integración Tecnológica (S0D53) · Docente: Sebastián Suárez Cores · Escuela Da Vinci</p>
     </div>
   </footer>
 
