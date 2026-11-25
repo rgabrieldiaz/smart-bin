@@ -5,7 +5,7 @@ Prototipo IoT desarrollado para el **Parcial 2** de la materia **PP: Integració
 * **Estudiante:** Ricardo Gabriel Díaz — Comisión `ACM5AV`
 * **Docente:** Sebastián Suárez Cores
 * **Simulador Wokwi en vivo:** https://wokwi.com/projects/481600182431364097
-* **Informe Técnico (Landing Page):** https://rgabrieldiaz.github.io/smart-bin-iot/
+* **Informe Técnico (Landing Page):** https://rgabrieldiaz.github.io/smart-bin/
 
 ---
 
