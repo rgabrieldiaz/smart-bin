@@ -11,3 +11,8 @@ desktop.ini
 .env
 *.env.local
 secrets.h
+
+# Documentos privados de estudio / defensa oral
+GUION_DEFENSA_ORAL.md
+GUION*.md
+*defensa*.md
