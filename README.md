@@ -39,3 +39,21 @@ Por buenas prácticas de seguridad, las credenciales reales del Bot no se versio
 const char* TELEGRAM_TOKEN   = "PEGAR_TOKEN_AQUI";
 const char* TELEGRAM_CHAT_ID = "PEGAR_CHAT_ID_AQUI";
 ```
+
+---
+
+## Relevamiento y Evolución Futura (Feedback de Cátedra)
+
+A partir de la devolución académica y el intercambio técnico con el docente, se relevó un nuevo requerimiento operativo para el backlog de mejoras del sistema:
+
+### Modo Bloqueo de Tapa / Lock Remoto (Protección Mascotas y Niños)
+* **Problema que resuelve:** En entornos hogareños u oficinas donde habitan mascotas (o niños pequeños), la detección por proximidad ultrasónica puede activarse de forma involuntaria, o los animales pueden intentar acceder a restos de comida durante la noche o en momentos de ausencia del usuario.
+* **Control bidireccional IoT vía Telegram:**
+  * Comando `/lock`: Envía una instrucción al ESP32 para forzar el servomotor a 0° (tapa cerrada) y deshabilitar temporalmente la lectura del sensor ultrasónico externo de proximidad.
+  * Comando `/unlock`: Restaura la operación normal y habilita la apertura automática por proximidad.
+  * Comando `/status`: Reporta en tiempo real el porcentaje de llenado y el estado de traba (`OPERATIVO` / `BLOQUEADO`).
+* **Arquitectura de estados prevista (FSM):**
+  * Incorporación del estado `ESTADO_BLOQUEADO` en la Máquina de Estados Finitos del firmware.
+  * Feedback visual en el display `LCD 16x2` (ej. `L1: Smart Bin [LOCK]`, `L2: Nivel: XX% [TRABADO]`) y señalización local.
+* **Alcance:** Requerimiento formalmente relevado en fase de especificación para futuras versiones; el código base actual de Wokwi se conserva estable con los entregables calificados del Parcial 2.
+
